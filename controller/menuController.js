@@ -2,7 +2,7 @@ const Navigation = require("../models/navigation");
 const Menu = require("../models/menu");
 
 exports.index = function (request, response) {
-    response.render("", {});
+    response.send("Hello");
 }
 
 exports.load = function (request, response) {
@@ -22,7 +22,7 @@ exports.dishes = function (request, response) {
 }
 
 exports.steaks = function (request, response) {
-    Menu.getMenuSteaks().then(res => {
+    Menu.getMenuCategory(1).then(res => {
         response.send(res);
     }).catch(err => {
         console.error(err.message);
@@ -30,7 +30,7 @@ exports.steaks = function (request, response) {
 }
 
 exports.burgers = function (request, response) {
-    Menu.getMenuBurgers().then(res => {
+    Menu.getMenuCategory(2).then(res => {
         response.send(res);
     }).catch(err => {
         console.error(err.message);
@@ -38,10 +38,40 @@ exports.burgers = function (request, response) {
 }
 
 exports.salads = function (request, response) {
-    Menu.getMenuSalads().then(res => {
+    Menu.getMenuCategory(3).then(res => {
         response.send(res);
     }).catch(err => {
         console.error(err.message);
     })
 }
 
+exports.createCategory = function (request, response) {
+    const nameCategory = request.params["name"];
+    console.log(nameCategory);
+    const menu = new Menu(nameCategory, null);
+    menu.createCategory().then(res=>{
+        response.send("Create category");
+    }).catch(err=>{
+        console.error(err.message);
+    });
+}
+
+exports.editCategory = function (request, response) {
+    const nameCategory = request.params["name"];
+    const idCategory = request.params["id"];
+    Menu.editCategory(nameCategory, idCategory).then(res=>{
+        response.send("Edit category");
+    }).catch(err=>{
+        console.error(err.message);
+    });
+}
+
+exports.deleteCategory = function (request, response) {
+    const nameCategory = request.params["name"];
+    console.log(nameCategory);
+    Menu.deleteCategory(nameCategory).then(res=>{
+        response.send("Delete category");
+    }).catch(err=>{
+        console.error(err.message);
+    });
+}
