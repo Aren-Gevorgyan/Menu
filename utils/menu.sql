@@ -13,4 +13,19 @@ CREATE TABLE IF NOT EXISTS navigation
     name          varchar(60)                                                     not null,
     created_at    timestamp default CURRENT_TIMESTAMP                             not null,
     updated_at    timestamp default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP not null
-)
+);
+
+CREATE TABLE IF NOT EXISTS assortment
+(
+    id              int,
+    name            varchar(160)                                                    not null,
+    price           integer,
+    waiting_time    integer,
+    weight          int,
+    apply_modifiers varchar(200),
+    description     varchar(250),
+    photo           varchar(250),
+    active          boolean,
+    created_at      timestamp default CURRENT_TIMESTAMP                             not null,
+    updated_at      timestamp default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP not null
+);

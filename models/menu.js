@@ -11,7 +11,7 @@ module.exports = class Menu {
 
     static getMenuDishes() {
         return new Promise(function (resolve, reject) {
-            const sql = "SELECT id, name FROM dishes WHERE assortment_id IS NULL";
+            const sql = "SELECT id, name FROM dishes ORDER BY id, name DESC";
             connectionMysql.query(sql, function (err, result) {
                 if (err) {
                     reject(err);
@@ -24,7 +24,7 @@ module.exports = class Menu {
 
     static getMenuCategory(id) {
         return new Promise(function (resolve, reject) {
-            const sql = "SELECT name FROM dishes WHERE assortment_id = ?";
+            const sql = "SELECT id, name FROM assortment WHERE assortment_id = ?";
             connectionMysql.query(sql, [id], function (err, result) {
                 if (err) {
                     reject(err);
