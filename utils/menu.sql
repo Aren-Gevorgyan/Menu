@@ -9,10 +9,10 @@ CREATE TABLE IF NOT EXISTS dishes
 
 CREATE TABLE IF NOT EXISTS navigation
 (
-    id            int unsigned unique auto_increment                              not null primary key,
-    name          varchar(60)                                                     not null,
-    created_at    timestamp default CURRENT_TIMESTAMP                             not null,
-    updated_at    timestamp default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP not null
+    id         int unsigned unique auto_increment                              not null primary key,
+    name       varchar(60)                                                     not null,
+    created_at timestamp default CURRENT_TIMESTAMP                             not null,
+    updated_at timestamp default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP not null
 );
 
 CREATE TABLE IF NOT EXISTS assortment
@@ -28,4 +28,14 @@ CREATE TABLE IF NOT EXISTS assortment
     active          boolean,
     created_at      timestamp default CURRENT_TIMESTAMP                             not null,
     updated_at      timestamp default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP not null
+);
+
+CREATE TABLE IF NOT EXISTS modifier
+(
+    id         int unsigned unique                                             not null auto_increment,
+    name       varchar(160)                                                    not null,
+    weight     integer,
+    price      integer,
+    created_at timestamp default CURRENT_TIMESTAMP                             not null,
+    updated_at timestamp default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP not null
 );
