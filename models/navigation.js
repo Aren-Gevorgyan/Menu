@@ -5,8 +5,7 @@ module.exports = class Navigation {
     constructor(name, link) {
         this.name = name;
         this.link = link;
-        this.navigationItem.push(this.name);
-        this.navigationItem.push(this.link);
+        this.navigationItem.push(this.name, this.link);
     }
 
     static getNavigationItem() {

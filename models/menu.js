@@ -2,11 +2,9 @@ const connectionMysql = require("../utils/db");
 let menuItem = [];
 module.exports = class Menu {
 
-    constructor(name, assortment_id) {
+    constructor(name) {
         this.name = name;
-        this.assortment_id = assortment_id;
         menuItem.push(this.name);
-        menuItem.push(this.assortment_id);
     }
 
     static getMenuDishes() {

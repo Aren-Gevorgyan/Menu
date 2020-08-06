@@ -3,7 +3,7 @@ const bodyParser = require("body-parser");
 const multer = require("multer");
 const app = express();
 const menuRouter = require("./router/menuRouter");
-var urlencodedParser = bodyParser.urlencoded({ extended: false })
+const urlencodedParser = bodyParser.urlencoded({extended: false});
 
 const storageConfig = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -14,13 +14,13 @@ const storageConfig = multer.diskStorage({
     }
 })
 
-const fileFilter = function(req, file, cb){
-    if(file.mimetype === "image/png"
+const fileFilter = function (req, file, cb) {
+    if (file.mimetype === "image/png"
         || file.mimetype === "image/jpg"
         || file.mimetype === "image/jpeg"
-        || file.mimetype === "image/svg"){
+        || file.mimetype === "image/svg") {
         cb(null, true);
-    }else{
+    } else {
         cb(null, false);
     }
 }
