@@ -36,7 +36,6 @@ module.exports = class Assortment {
         })
     }
 
-//new
     createAssortment() {
         return new Promise(function (resolve, reject) {
             const sql = "INSERT INTO assortment(name, price, waiting_time, weight, apply_modifiers, description, photo, active, assortment_id)\n" +
@@ -52,7 +51,6 @@ module.exports = class Assortment {
         })
     }
 
-//new
     static editAssortment(name, price, waiting, weight, apply_modifiers, description, photo, active, id) {
         return new Promise(function (resolve, reject) {
             const sql = "UPDATE assortment SET name=?, price=?, waiting_time=?, weight=?, apply_modifiers=?, description=?, photo=?, active=? WHERE id=?;"

@@ -1,6 +1,7 @@
 const Navigation = require("../models/navigation");
 const Menu = require("../models/menu");
 const Assortment = require("../models/assortment");
+const Modifier = require("../models/modifier");
 
 exports.index = function (request, response) {
     response.send("Hello");
@@ -16,7 +17,7 @@ exports.load = function (request, response) {
 
 exports.dishes = function (request, response) {
     Menu.getMenuDishes().then(res => {
-        response.send(res);
+        response.json(res);
     }).catch(err => {
         console.error(err.message);
     })
@@ -25,7 +26,7 @@ exports.dishes = function (request, response) {
 exports.assortment = function (request, response) {
     const getIdCategory = request.params["id"];
     Menu.getMenuCategory(getIdCategory).then(res => {
-        response.send(res);
+        response.json(res);
     }).catch(err => {
         console.error(err.message);
     })
@@ -51,7 +52,6 @@ exports.editCategory = function (request, response) {
     });
 }
 
-//new
 exports.deleteCategory = function (request, response) {
     const nameCategory = request.params["name"];
     Menu.deleteCategory(nameCategory).then(res => {
@@ -60,7 +60,7 @@ exports.deleteCategory = function (request, response) {
         console.error(err.message);
     });
 }
-//new
+
 exports.deleteAssortment = function (request, response) {
     const idAssortment = request.params["id"];
     Assortment.deleteAssortment(idAssortment).then(res => {
@@ -69,7 +69,7 @@ exports.deleteAssortment = function (request, response) {
         console.error(err.message);
     });
 }
-//new
+
 exports.createAssortment = function (request, response) {
     if (!request.body) return response.sendStatus(404);
     console.log(request.body);
@@ -90,7 +90,7 @@ exports.createAssortment = function (request, response) {
         console.error(err.message);
     });
 }
-//new
+
 exports.editAssortment = function (request, response) {
     if (!request.body) return response.sendStatus(404);
     const idAssortment = request.params["id"];
@@ -109,4 +109,32 @@ exports.editAssortment = function (request, response) {
         }).catch(err => {
         console.error(err.message);
     });
+}
+
+exports.createModifier = function (request, response) {
+    const nameModifier = request.params["name"];
+    const price = request.params["price"];
+    const weight = request.params["weight"];
+    const modifier = new Modifier(nameModifier, price, weight);
+    modifier.createModifier().then(res => {
+        response.send("Create modifier");
+    }).catch(err => {
+        console.error(err.message);
+    });
+}
+
+exports.modifier = function (request, response) {
+    Modifier.getModifierData().then(res => {
+        response.json(res);
+    }).catch(err => {
+        console.error(err.message);
+    })
+}
+
+exports.editModifier = function (request, response) {
+    Modifier.editModifier().then(res => {
+        response.json(res);
+    }).catch(err => {
+        console.error(err.message);
+    })
 }
