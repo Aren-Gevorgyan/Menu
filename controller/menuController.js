@@ -2,6 +2,8 @@ const Navigation = require("../models/navigation");
 const Menu = require("../models/menu");
 const Assortment = require("../models/assortment");
 const Modifier = require("../models/modifier");
+const ArchiveCategory = require("../models/archiveCategory");
+const ArchiveItem = require("../models/archiveItems");
 
 exports.index = function (request, response) {
     response.send("Hello");
@@ -53,8 +55,49 @@ exports.editCategory = function (request, response) {
 }
 
 exports.deleteCategory = function (request, response) {
-    const nameCategory = request.params["name"];
-    Menu.deleteCategory(nameCategory).then(res => {
+    const idCategory = request.params["id"];
+    appendCategoryArchive(idCategory);
+    appendAssortmentInArchiveItem(idCategory, response);
+}
+
+function appendCategoryArchive(idCategory) {
+    Menu.getCategory(idCategory).then(res => {
+        let categoryName = res[0].name;
+        console.log(1)
+        getCountChildCategoryAndAppendArchive(categoryName, idCategory)
+    })
+}
+
+function getCountChildCategoryAndAppendArchive(categoryName, idCategory) {
+    Assortment.getCountChildCategory(idCategory).then(res => {
+        let getCountChildCategory = res[0].countValue;
+        console.log(getCountChildCategory);
+        const archive = new ArchiveCategory(categoryName, getCountChildCategory);
+        archive.appendItem();
+    })
+}
+
+function appendAssortmentInArchiveItem(id, response) {
+    Assortment.getAllDataAssortment(id).then(res => {
+        let archiveItem;
+        getAllDataWithTheSameIdFromAssortment_id(archiveItem, res);
+        deleteCategory(id, response);
+    }).catch(err => {
+        console.error(err.message);
+    })
+}
+
+function getAllDataWithTheSameIdFromAssortment_id(archiveItem, res){
+    for (const assortmentKey in res) {
+        archiveItem = new ArchiveItem(res[assortmentKey].name, res[assortmentKey].price, res[assortmentKey].waiting_time, res[assortmentKey].weight,
+            res[assortmentKey].apply_modifiers, res[assortmentKey].description, res[assortmentKey].photo, res[assortmentKey].active, res[assortmentKey].assortment_id, 1);
+        archiveItem.appendItems();
+    }
+}
+
+function deleteCategory(idCategory, response) {
+    console.log(3);
+    Menu.deleteCategory(idCategory).then(res => {
         response.send("Delete category");
     }).catch(err => {
         console.error(err.message);

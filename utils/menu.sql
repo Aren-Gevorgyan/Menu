@@ -1,10 +1,9 @@
 CREATE TABLE IF NOT EXISTS dishes
 (
-    id            int unsigned unique auto_increment                              not null primary key,
-    name          varchar(60)                                                     not null,
-    assortment_id bigint unsigned,
-    created_at    timestamp default CURRENT_TIMESTAMP                             not null,
-    updated_at    timestamp default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP not null
+    id         int unsigned unique auto_increment                              not null primary key,
+    name       varchar(60)                                                     not null,
+    created_at timestamp default CURRENT_TIMESTAMP                             not null,
+    updated_at timestamp default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP not null
 );
 
 CREATE TABLE IF NOT EXISTS navigation
@@ -17,7 +16,7 @@ CREATE TABLE IF NOT EXISTS navigation
 
 CREATE TABLE IF NOT EXISTS assortment
 (
-    id              int,
+    id              int unsigned unique                                             not null auto_increment primary key,
     name            varchar(160)                                                    not null,
     price           integer,
     waiting_time    integer,
@@ -26,8 +25,12 @@ CREATE TABLE IF NOT EXISTS assortment
     description     varchar(250),
     photo           varchar(250),
     active          boolean,
+    assortment_id   int unsigned,
     created_at      timestamp default CURRENT_TIMESTAMP                             not null,
-    updated_at      timestamp default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP not null
+    updated_at      timestamp default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP not null,
+    FOREIGN KEY (assortment_id)
+        REFERENCES dishes (id)
+        ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS modifier

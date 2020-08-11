@@ -5,7 +5,7 @@ const menuController = require("../controller/menuController");
 menuRouter.get("/dishes/category/edit/:name/:id", menuController.editCategory);
 menuRouter.get("/modifier/create/:name/:weight/:price", menuController.createModifier);
 menuRouter.get("/dishes/category/create/:name", menuController.createCategory);
-menuRouter.get("/dishes/category/delete/:name", menuController.deleteCategory);
+menuRouter.get("/dishes/category/delete/:id", menuController.deleteCategory);
 menuRouter.get("/dishes/assortment/delete/:id", menuController.deleteAssortment);
 menuRouter.post("/dishes/assortment/edit/:id", menuController.editAssortment);
 menuRouter.post("/dishes/assortment/create", menuController.createAssortment);

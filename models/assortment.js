@@ -63,4 +63,32 @@ module.exports = class Assortment {
             })
         })
     }
+
+    static getCountChildCategory(id) {
+
+        return new Promise(function (resolve, reject) {
+            const sql = "SELECT COUNT(*) AS countValue FROM assortment WHERE assortment_id = ?";
+            connectionMysql.query(sql, [id], function (err, result) {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(result);
+                }
+            })
+        })
+    }
+
+    static getAllDataAssortment(id) {
+        return new Promise(function (resolve, reject) {
+            const sql = "SELECT * FROM assortment WHERE assortment_id = ?";
+            connectionMysql.query(sql, [id], function (err, result) {
+                if (err) {
+                    reject(err);
+                } else {
+                    console.log(result);
+                    resolve(result);
+                }
+            })
+        })
+    }
 }

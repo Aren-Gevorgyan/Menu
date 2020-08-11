@@ -33,6 +33,19 @@ module.exports = class Menu {
         })
     }
 
+    static getCategory(id){
+        return new Promise(function (resolve, reject) {
+            const sql = "SELECT name FROM dishes WHERE id = ?";
+            connectionMysql.query(sql, [id], function (err, result) {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(result);
+                }
+            })
+        })
+    }
+
     createCategory() {
         return new Promise(function (resolve, reject) {
             const sql = "INSERT INTO dishes(NAME, ASSORTMENT_ID) VALUE (?,?)";
@@ -62,7 +75,7 @@ module.exports = class Menu {
 
     static deleteCategory(name) {
         return new Promise(function (resolve, reject) {
-            const sql = "DELETE FROM dishes WHERE name = ?";
+            const sql = "DELETE FROM dishes WHERE id = ?";
             connectionMysql.query(sql, [name], function (err, result) {
                 if (err) {
                     reject(err);
