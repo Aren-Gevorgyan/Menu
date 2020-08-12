@@ -50,7 +50,7 @@ CREATE TABLE IF NOT EXISTS modifier
 CREATE TABLE IF NOT EXISTS archiveModifier
 (
     id          int unsigned unique                                             not null auto_increment primary key,
-    name        varchar(120),
+    name        varchar(120) unique,
     number_item int unsigned,
     created_at  timestamp default CURRENT_TIMESTAMP                             not null,
     updated_at  timestamp default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP not null

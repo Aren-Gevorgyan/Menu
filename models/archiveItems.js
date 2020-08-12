@@ -37,4 +37,31 @@ module.exports = class Archive {
             archiveItems.length = 0;
         })
     }
+
+    static getAllDataArchiveItem(name) {
+        return new Promise(function (resolve, reject) {
+            const sql = "SELECT * FROM archiveItems WHERE dishes_name = ?";
+            connectionMysql.query(sql, [name], function (err, result) {
+                if (err) {
+                    reject(err);
+                } else {
+                    console.log(result);
+                    resolve(result);
+                }
+            })
+        })
+    }
+
+    static deleteItemsCategoryDuringRestore(name) {
+        return new Promise(function (resolve, reject) {
+            const sql = "DELETE FROM archiveitems WHERE dishes_name = ?";
+            connectionMysql.query(sql, [name], function (err, result) {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(result);
+                }
+            })
+        })
+    }
 }

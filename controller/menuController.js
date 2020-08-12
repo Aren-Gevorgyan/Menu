@@ -78,19 +78,19 @@ function getCountChildCategoryAndAppendArchive(categoryName, nameCategory) {
 
 function appendAssortmentInArchiveItem(id, name, response) {
     Assortment.getAllDataAssortment(name).then(res => {
-        getAllDataWithTheSameIdFromAssortment_id(res);
+        getAllDataWithTheSameIdFromDishes_nameFromAssortemnt(res, ArchiveItem);
         deleteCategory(id, response);
     }).catch(err => {
         console.error(err.message);
     })
 }
 
-function getAllDataWithTheSameIdFromAssortment_id(res) {
-    let archiveItem;
+function getAllDataWithTheSameIdFromDishes_nameFromAssortemnt(res, value) {
+    let assortment;
     for (let assortmentKey in res) {
-        archiveItem = new ArchiveItem(res[assortmentKey].name, res[assortmentKey].price, res[assortmentKey].waiting_time, res[assortmentKey].weight,
+        assortment = new value(res[assortmentKey].name, res[assortmentKey].price, res[assortmentKey].waiting_time, res[assortmentKey].weight,
             res[assortmentKey].apply_modifiers, res[assortmentKey].description, res[assortmentKey].photo, res[assortmentKey].active, res[assortmentKey].dishes_name);
-        archiveItem.appendItems();
+        assortment.appendItems();
     }
 }
 
@@ -186,3 +186,41 @@ exports.editModifier = function (request, response) {
         console.error(err.message);
     })
 }
+
+exports.restoreCategory = function (request, response) {
+    const nameCategory = request.params["name"];
+    restoreCategory(nameCategory, response);
+    restoreAssortment(nameCategory, response);
+    ArchiveCategory.deleteCategoryDuringRestore(nameCategory);
+    ArchiveItem.deleteItemsCategoryDuringRestore(nameCategory).then(() => {
+        response.send("Restore category");
+    });
+}
+
+function restoreCategory(nameCategory) {
+    const menu = new Menu(nameCategory, null);
+    menu.createCategory().catch(err => {
+        console.error(err.message);
+    });
+}
+
+function restoreAssortment(nameCategory, response) {
+    ArchiveItem.getAllDataArchiveItem(nameCategory).then(res => {
+        getAllDataWithTheSameIdFromDishes_nameFromArchiveItems(res, response);
+    }).catch(err => {
+        console.error(err.message);
+    })
+}
+
+function getAllDataWithTheSameIdFromDishes_nameFromArchiveItems(res, response) {
+    let assortment;
+    for (let assortmentKey in res) {
+        assortment = new Assortment(res[assortmentKey].name, res[assortmentKey].price, res[assortmentKey].waiting_time, res[assortmentKey].weight,
+            res[assortmentKey].apply_modifiers, res[assortmentKey].description, res[assortmentKey].photo, res[assortmentKey].active, res[assortmentKey].dishes_name);
+
+        assortment.createAssortment().catch(err => {
+            console.error(err.message);
+        });
+    }
+}
+

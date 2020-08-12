@@ -21,4 +21,17 @@ module.exports = class Archive {
             archiveCategory.length = 0;
         })
     }
+
+    static deleteCategoryDuringRestore(name) {
+        return new Promise(function (resolve, reject) {
+            const sql = "DELETE FROM archiveCategory WHERE name = ?";
+            connectionMysql.query(sql, [name], function (err, result) {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(result);
+                }
+            })
+        })
+    }
 }
