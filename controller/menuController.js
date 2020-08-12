@@ -26,8 +26,8 @@ exports.dishes = function (request, response) {
 }
 
 exports.assortment = function (request, response) {
-    const getIdCategory = request.params["id"];
-    Menu.getMenuCategory(getIdCategory).then(res => {
+    const getIdCategory = request.params["name"];
+    Menu.getChildMenuCategory(getIdCategory).then(res => {
         response.json(res);
     }).catch(err => {
         console.error(err.message);
@@ -37,7 +37,7 @@ exports.assortment = function (request, response) {
 exports.createCategory = function (request, response) {
     const nameCategory = request.params["name"];
     const menu = new Menu(nameCategory, null);
-    menu.createCategory().then(res => {
+    menu.createCategory().then(() => {
         response.send("Create category");
     }).catch(err => {
         console.error(err.message);
@@ -47,7 +47,7 @@ exports.createCategory = function (request, response) {
 exports.editCategory = function (request, response) {
     const nameCategory = request.params["name"];
     const idCategory = request.params["id"];
-    Menu.editCategory(nameCategory, idCategory).then(res => {
+    Menu.editCategory(nameCategory, idCategory).then(() => {
         response.send("Edit category");
     }).catch(err => {
         console.error(err.message);
@@ -56,48 +56,46 @@ exports.editCategory = function (request, response) {
 
 exports.deleteCategory = function (request, response) {
     const idCategory = request.params["id"];
-    appendCategoryArchive(idCategory);
-    appendAssortmentInArchiveItem(idCategory, response);
+    const nameCategory = request.params["name"];
+    appendCategoryArchive(idCategory, nameCategory);
+    appendAssortmentInArchiveItem(idCategory, nameCategory, response);
 }
 
-function appendCategoryArchive(idCategory) {
+function appendCategoryArchive(idCategory, nameCategory) {
     Menu.getCategory(idCategory).then(res => {
         let categoryName = res[0].name;
-        console.log(1)
-        getCountChildCategoryAndAppendArchive(categoryName, idCategory)
+        getCountChildCategoryAndAppendArchive(categoryName, nameCategory)
     })
 }
 
-function getCountChildCategoryAndAppendArchive(categoryName, idCategory) {
-    Assortment.getCountChildCategory(idCategory).then(res => {
+function getCountChildCategoryAndAppendArchive(categoryName, nameCategory) {
+    Assortment.getCountChildCategory(nameCategory).then(res => {
         let getCountChildCategory = res[0].countValue;
-        console.log(getCountChildCategory);
         const archive = new ArchiveCategory(categoryName, getCountChildCategory);
         archive.appendItem();
     })
 }
 
-function appendAssortmentInArchiveItem(id, response) {
-    Assortment.getAllDataAssortment(id).then(res => {
-        let archiveItem;
-        getAllDataWithTheSameIdFromAssortment_id(archiveItem, res);
+function appendAssortmentInArchiveItem(id, name, response) {
+    Assortment.getAllDataAssortment(name).then(res => {
+        getAllDataWithTheSameIdFromAssortment_id(res);
         deleteCategory(id, response);
     }).catch(err => {
         console.error(err.message);
     })
 }
 
-function getAllDataWithTheSameIdFromAssortment_id(archiveItem, res){
-    for (const assortmentKey in res) {
+function getAllDataWithTheSameIdFromAssortment_id(res) {
+    let archiveItem;
+    for (let assortmentKey in res) {
         archiveItem = new ArchiveItem(res[assortmentKey].name, res[assortmentKey].price, res[assortmentKey].waiting_time, res[assortmentKey].weight,
-            res[assortmentKey].apply_modifiers, res[assortmentKey].description, res[assortmentKey].photo, res[assortmentKey].active, res[assortmentKey].assortment_id, 1);
+            res[assortmentKey].apply_modifiers, res[assortmentKey].description, res[assortmentKey].photo, res[assortmentKey].active, res[assortmentKey].dishes_name);
         archiveItem.appendItems();
     }
 }
 
 function deleteCategory(idCategory, response) {
-    console.log(3);
-    Menu.deleteCategory(idCategory).then(res => {
+    Menu.deleteCategory(idCategory).then(() => {
         response.send("Delete category");
     }).catch(err => {
         console.error(err.message);
@@ -106,7 +104,7 @@ function deleteCategory(idCategory, response) {
 
 exports.deleteAssortment = function (request, response) {
     const idAssortment = request.params["id"];
-    Assortment.deleteAssortment(idAssortment).then(res => {
+    Assortment.deleteAssortment(idAssortment).then(() => {
         response.send("Delete assortment");
     }).catch(err => {
         console.error(err.message);
@@ -115,8 +113,7 @@ exports.deleteAssortment = function (request, response) {
 
 exports.createAssortment = function (request, response) {
     if (!request.body) return response.sendStatus(404);
-    console.log(request.body);
-    const idCategory = request.body.id;
+    const nameCategory = request.params["name"];
     const nameAssortment = request.body.name;
     const price = request.body.price;
     const waiting_time = request.body.waiting_time;
@@ -125,9 +122,13 @@ exports.createAssortment = function (request, response) {
     const photo = request.body.photo;
     const active = request.body.active;
 
-    const assortment = new Assortment(nameAssortment, price, waiting_time, weight, description, photo, active, idCategory);
+    setValueForCreateAssortment(nameAssortment, price, waiting_time, weight, description, photo, active, nameCategory);
+}
 
-    assortment.createAssortment().then(res => {
+function setValueForCreateAssortment(nameAssortment, price, waiting_time, weight, description, photo, active, nameCategory) {
+    const assortment = new Assortment(nameAssortment, price, waiting_time, weight, description, photo, active, nameCategory);
+
+    assortment.createAssortment().then(() => {
         response.send("Create assortment");
     }).catch(err => {
         console.error(err.message);
@@ -146,8 +147,12 @@ exports.editAssortment = function (request, response) {
     const photo = request.body.photo;
     const active = request.body.active;
 
+    setValueForEditAssortment(nameAssortment, price, waiting_time, weight, apply_modifiers, description, photo, active, idAssortment);
+}
+
+function setValueForEditAssortment(nameAssortment, price, waiting_time, weight, apply_modifiers, description, photo, active, idAssortment) {
     Assortment.editAssortment(nameAssortment, price, waiting_time, weight, apply_modifiers, description, photo, active, idAssortment)
-        .then(res => {
+        .then(() => {
             response.send("Edit assortment");
         }).catch(err => {
         console.error(err.message);
@@ -159,7 +164,7 @@ exports.createModifier = function (request, response) {
     const price = request.params["price"];
     const weight = request.params["weight"];
     const modifier = new Modifier(nameModifier, price, weight);
-    modifier.createModifier().then(res => {
+    modifier.createModifier().then(() => {
         response.send("Create modifier");
     }).catch(err => {
         console.error(err.message);

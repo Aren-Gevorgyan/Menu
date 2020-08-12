@@ -7,6 +7,20 @@ module.exports = class Menu {
         menuItem.push(this.name);
     }
 
+    createCategory() {
+        return new Promise(function (resolve, reject) {
+            const sql = "INSERT INTO dishes(NAME ) VALUE (?)";
+            connectionMysql.query(sql, menuItem, function (err, result) {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(result);
+                }
+            })
+            menuItem.length = 0;
+        })
+    }
+
     static getMenuDishes() {
         return new Promise(function (resolve, reject) {
             const sql = "SELECT id, name FROM dishes ORDER BY id, name DESC";
@@ -20,10 +34,10 @@ module.exports = class Menu {
         })
     }
 
-    static getMenuCategory(id) {
+    static getChildMenuCategory(name) {
         return new Promise(function (resolve, reject) {
-            const sql = "SELECT id, name FROM assortment WHERE assortment_id = ?";
-            connectionMysql.query(sql, [id], function (err, result) {
+            const sql = "SELECT id, name FROM assortment WHERE dishes_name = ?";
+            connectionMysql.query(sql, [name], function (err, result) {
                 if (err) {
                     reject(err);
                 } else {
@@ -46,20 +60,6 @@ module.exports = class Menu {
         })
     }
 
-    createCategory() {
-        return new Promise(function (resolve, reject) {
-            const sql = "INSERT INTO dishes(NAME, ASSORTMENT_ID) VALUE (?,?)";
-            connectionMysql.query(sql, menuItem, function (err, result) {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(result);
-                }
-            })
-            menuItem.length = 0;
-        })
-    }
-
     static editCategory(name, id) {
         return new Promise(function (resolve, reject) {
             const sql = "UPDATE dishes SET name = ? WHERE id = ?";
@@ -73,10 +73,10 @@ module.exports = class Menu {
         })
     }
 
-    static deleteCategory(name) {
+    static deleteCategory(id) {
         return new Promise(function (resolve, reject) {
             const sql = "DELETE FROM dishes WHERE id = ?";
-            connectionMysql.query(sql, [name], function (err, result) {
+            connectionMysql.query(sql, [id], function (err, result) {
                 if (err) {
                     reject(err);
                 } else {

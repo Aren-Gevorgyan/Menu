@@ -2,7 +2,7 @@ const connectionMysql = require("../utils/db");
 let archiveItems = [];
 
 module.exports = class Archive {
-    constructor(name, price, waiting_time, weight, apply_modifiers, description, photo, active, assortment_id) {
+    constructor(name, price, waiting_time, weight, apply_modifiers, description, photo, active, dishes_name) {
         this.name = name;
         this.price = price;
         this.waiting_time = waiting_time;
@@ -11,7 +11,7 @@ module.exports = class Archive {
         this.description = description;
         this.photo = photo;
         this.active = active;
-        this.assortment_id = assortment_id;
+        this.dishes_name = dishes_name;
         archiveItems.push(this.name,
             this.price,
             this.waiting_time,
@@ -20,12 +20,12 @@ module.exports = class Archive {
             this.description,
             this.photo,
             this.active,
-            this.assortment_id);
+            this.dishes_name);
     }
 
     appendItems() {
         return new Promise(function (resolve, reject) {
-            const sql = "INSERT INTO archiveItems(name, price, waiting_time, weight, apply_modifiers, description, photo, active, assortment_id)\n" +
+            const sql = "INSERT INTO archiveItems(name, price, waiting_time, weight, apply_modifiers, description, photo, active, dishes_name)\n" +
                 " VALUE (?, ?, ?, ?, ?, ?, ?, ?, ?);"
             connectionMysql.query(sql, archiveItems, function (err, result) {
                 if (err) {

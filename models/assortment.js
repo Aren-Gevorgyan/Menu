@@ -2,7 +2,7 @@ const connectionMysql = require("../utils/db");
 let assortmentItem = [];
 
 module.exports = class Assortment {
-    constructor(name, price, waiting_time, weight, apply_modifiers, description, photo, active, assortment_id) {
+    constructor(name, price, waiting_time, weight, apply_modifiers, description, photo, active, dishes_name) {
         this.name = name;
         this.price = price;
         this.waiting_time = waiting_time;
@@ -11,7 +11,7 @@ module.exports = class Assortment {
         this.description = description;
         this.photo = photo;
         this.active = active;
-        this.assortment_id = assortment_id;
+        this.dishes_name = dishes_name;
         assortmentItem.push(this.name,
             this.price,
             this.waiting_time,
@@ -20,7 +20,7 @@ module.exports = class Assortment {
             this.description,
             this.photo,
             this.active,
-            this.assortment_id);
+            this.dishes_name);
     }
 
     static deleteAssortment(id) {
@@ -38,7 +38,7 @@ module.exports = class Assortment {
 
     createAssortment() {
         return new Promise(function (resolve, reject) {
-            const sql = "INSERT INTO assortment(name, price, waiting_time, weight, apply_modifiers, description, photo, active, assortment_id)\n" +
+            const sql = "INSERT INTO assortment(name, price, waiting_time, weight, apply_modifiers, description, photo, active, dishes_name)\n" +
                 "    VALUE (?, ?, ?, ?, ?, ?, ?, ?, ?);"
             connectionMysql.query(sql, assortmentItem, function (err, result) {
                 if (err) {
@@ -64,11 +64,11 @@ module.exports = class Assortment {
         })
     }
 
-    static getCountChildCategory(id) {
+    static getCountChildCategory(name) {
 
         return new Promise(function (resolve, reject) {
-            const sql = "SELECT COUNT(*) AS countValue FROM assortment WHERE assortment_id = ?";
-            connectionMysql.query(sql, [id], function (err, result) {
+            const sql = "SELECT COUNT(*) AS countValue FROM assortment WHERE dishes_name = ?";
+            connectionMysql.query(sql, [name], function (err, result) {
                 if (err) {
                     reject(err);
                 } else {
@@ -78,10 +78,10 @@ module.exports = class Assortment {
         })
     }
 
-    static getAllDataAssortment(id) {
+    static getAllDataAssortment(name) {
         return new Promise(function (resolve, reject) {
-            const sql = "SELECT * FROM assortment WHERE assortment_id = ?";
-            connectionMysql.query(sql, [id], function (err, result) {
+            const sql = "SELECT * FROM assortment WHERE dishes_name = ?";
+            connectionMysql.query(sql, [name], function (err, result) {
                 if (err) {
                     reject(err);
                 } else {
