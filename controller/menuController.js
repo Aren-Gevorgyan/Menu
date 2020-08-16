@@ -4,6 +4,7 @@ const Assortment = require("../models/assortment");
 const Modifier = require("../models/modifier");
 const ArchiveCategory = require("../models/archiveCategory");
 const ArchiveItem = require("../models/archiveItems");
+const ArchiveModifier = require("../models/archiveModifier");
 
 exports.index = function (request, response) {
     response.send("Hello");
@@ -77,7 +78,7 @@ function getCountChildCategoryAndAppendArchive(categoryName, nameCategory) {
 }
 
 function appendAssortmentInArchiveItem(id, name, response) {
-    Assortment.getAllDataAssortment(name).then(res => {
+    Assortment.getAllDataAssortmentThroughName(name).then(res => {
         getAllDataWithTheSameIdFromDishes_nameFromAssortemnt(res, ArchiveItem);
         deleteCategory(id, response);
     }).catch(err => {
@@ -104,10 +105,23 @@ function deleteCategory(idCategory, response) {
 
 exports.deleteAssortment = function (request, response) {
     const idAssortment = request.params["id"];
+    appendAssortmentArchive(idAssortment);
+    deleteAssortment(idAssortment, response);
+}
+
+function deleteAssortment(idAssortment, response) {
     Assortment.deleteAssortment(idAssortment).then(() => {
         response.send("Delete assortment");
     }).catch(err => {
         console.error(err.message);
+    });
+}
+
+function appendAssortmentArchive(idAssortment) {
+    Assortment.getAllDataAssortmentThroughId(idAssortment).then(res => {
+        const archiveItems = new ArchiveItem(res[0].name, res[0].price, res[0].waiting_time, res[0].weight,
+            res[0].apply_modifiers, res[0].description, res[0].photo, res[0].active, res[0].dishes_name);
+        archiveItems.appendItems();
     });
 }
 
@@ -135,6 +149,43 @@ function setValueForCreateAssortment(nameAssortment, price, waiting_time, weight
     });
 }
 
+exports.restoreCategory = function (request, response) {
+    const nameCategory = request.params["name"];
+    restoreCategory(nameCategory, response);
+    restoreAssortmentThroughName(nameCategory, response);
+    ArchiveCategory.deleteCategoryDuringRestore(nameCategory);
+    ArchiveItem.deleteItemsCategoryDuringRestore(nameCategory).then(() => {
+        response.send("Restore category");
+    });
+}
+
+function restoreCategory(nameCategory) {
+    const menu = new Menu(nameCategory, null);
+    menu.createCategory().catch(err => {
+        console.error(err.message);
+    });
+}
+
+function restoreAssortmentThroughName(nameCategory, response) {
+    ArchiveItem.getAllDataArchiveItem(nameCategory).then(res => {
+        getAllDataWithTheSameIdFromDishes_nameFromArchiveItems(res, response);
+    }).catch(err => {
+        console.error(err.message);
+    })
+}
+
+function getAllDataWithTheSameIdFromDishes_nameFromArchiveItems(res) {
+    let assortment;
+    for (let assortmentKey in res) {
+        assortment = new Assortment(res[assortmentKey].name, res[assortmentKey].price, res[assortmentKey].waiting_time, res[assortmentKey].weight,
+            res[assortmentKey].apply_modifiers, res[assortmentKey].description, res[assortmentKey].photo, res[assortmentKey].active, res[assortmentKey].dishes_name);
+
+        assortment.createAssortment().catch(err => {
+            console.error(err.message);
+        });
+    }
+}
+
 exports.editAssortment = function (request, response) {
     if (!request.body) return response.sendStatus(404);
     const idAssortment = request.params["id"];
@@ -159,17 +210,25 @@ function setValueForEditAssortment(nameAssortment, price, waiting_time, weight, 
     });
 }
 
-exports.createModifier = function (request, response) {
-    const nameModifier = request.params["name"];
-    const price = request.params["price"];
-    const weight = request.params["weight"];
-    const modifier = new Modifier(nameModifier, price, weight);
-    modifier.createModifier().then(() => {
-        response.send("Create modifier");
-    }).catch(err => {
-        console.error(err.message);
+exports.restoreAssortment = function (request, response) {
+    const idAssortment = request.params["id"];
+    restoreAssortmentThroughId(idAssortment)
+    ArchiveItem.deleteItemDishes(idAssortment).then(() => {
+        response.send("Restore Assortment");
     });
 }
+
+function restoreAssortmentThroughId(idAssortment) {
+    ArchiveItem.getAllDataArchiveItemThroughId(idAssortment).then(res => {
+        const assortment = new Assortment(res[0].name, res[0].price, res[0].waiting_time, res[0].weight,
+            res[0].apply_modifiers, res[0].description, res[0].photo, res[0].active, res[0].dishes_name);
+
+        assortment.createAssortment().catch(err => {
+            console.error(err.message);
+        });
+    })
+}
+
 
 exports.modifier = function (request, response) {
     Modifier.getModifierData().then(res => {
@@ -179,48 +238,81 @@ exports.modifier = function (request, response) {
     })
 }
 
+exports.createModifier = function (request, response) {
+    const nameModifier = request.params["name"];
+    const price = request.params["price"];
+    const weight = request.params["weight"];
+    const modifier = new Modifier(nameModifier, price, weight);
+
+    modifier.createModifier().then(() => {
+        response.send("Create modifier");
+    }).catch(err => {
+        console.error(err.message);
+    });
+}
+
 exports.editModifier = function (request, response) {
-    Modifier.editModifier().then(res => {
-        response.json(res);
+    const nameModifier = request.params["name"];
+    const price = request.params["price"];
+    const weight = request.params["weight"];
+    const id = request.params["id"];
+
+    Modifier.editModifier(nameModifier, weight, price, id).then(() => {
+        response.send("Edit modifier");
     }).catch(err => {
         console.error(err.message);
     })
 }
 
-exports.restoreCategory = function (request, response) {
-    const nameCategory = request.params["name"];
-    restoreCategory(nameCategory, response);
-    restoreAssortment(nameCategory, response);
-    ArchiveCategory.deleteCategoryDuringRestore(nameCategory);
-    ArchiveItem.deleteItemsCategoryDuringRestore(nameCategory).then(() => {
-        response.send("Restore category");
-    });
+exports.deleteModifier = function (request, response) {
+    const id = request.params["id"];
+    appendModifierArchive(id);
+    deleteModifier(id, response);
 }
 
-function restoreCategory(nameCategory) {
-    const menu = new Menu(nameCategory, null);
-    menu.createCategory().catch(err => {
-        console.error(err.message);
-    });
-}
-
-function restoreAssortment(nameCategory, response) {
-    ArchiveItem.getAllDataArchiveItem(nameCategory).then(res => {
-        getAllDataWithTheSameIdFromDishes_nameFromArchiveItems(res, response);
+function deleteModifier(id, response) {
+    Modifier.deleteModifier(id).then(() => {
+        response.send("Delete modifier");
     }).catch(err => {
         console.error(err.message);
-    })
+    });
 }
 
-function getAllDataWithTheSameIdFromDishes_nameFromArchiveItems(res, response) {
-    let assortment;
-    for (let assortmentKey in res) {
-        assortment = new Assortment(res[assortmentKey].name, res[assortmentKey].price, res[assortmentKey].waiting_time, res[assortmentKey].weight,
-            res[assortmentKey].apply_modifiers, res[assortmentKey].description, res[assortmentKey].photo, res[assortmentKey].active, res[assortmentKey].dishes_name);
-
-        assortment.createAssortment().catch(err => {
+function appendModifierArchive(id) {
+    Modifier.getModifierDataThroughId(id).then(res => {
+        const archiveModifier = new ArchiveModifier(res[0].name, res[0].weight, res[0].price);
+        archiveModifier.createItemInArchiveModifier().catch(err => {
             console.error(err.message);
         });
-    }
+    }).catch(err => {
+        console.error(err.message);
+    });
 }
+
+exports.restoreModifier = function (request, response) {
+    const id = request.params["id"];
+    restoreModifier(request, id)
+    deleteModifierFromArchive(request, response, id);
+}
+
+function restoreModifier(request, id) {
+    ArchiveModifier.getModifierDataThroughId(id).then(res => {
+        console.log(res);
+        const modifier = new Modifier(res[0].name, res[0].weight, res[0].price);
+        modifier.createModifier();
+    }).catch(err => {
+        console.error(err.message);
+    });
+}
+
+function deleteModifierFromArchive(request, response, id) {
+    ArchiveModifier.deleteModifier(id).then(() => {
+        response.send("Restore modifier");
+    }).catch(err => {
+        console.error(err.message);
+    });
+}
+
+
+
 

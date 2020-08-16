@@ -19,13 +19,53 @@ module.exports = class Modifier {
                     resolve(result);
                 }
             })
+            modifierItem.length = 0;
         })
     }
 
     static getModifierData() {
         return new Promise(function (resolve, reject) {
-            const sql = "SELECT id, name FROM modifier";
+            const sql = "SELECT id, name, weight, price FROM modifier";
             connectionMysql.query(sql, function (err, result) {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(result);
+                }
+            })
+        })
+    }
+
+    static getModifierDataThroughId(id) {
+        return new Promise(function (resolve, reject) {
+            const sql = "SELECT id, name, weight, price FROM modifier WHERE id = ?";
+            connectionMysql.query(sql, [id],function (err, result) {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(result);
+                }
+            })
+        })
+    }
+
+    static editModifier(name, weight, price, id){
+        return new Promise(function (resolve, reject) {
+            const sql = "UPDATE modifier SET name=?, weight=?, price=?  WHERE id=?;"
+            connectionMysql.query(sql, [name, weight, price, id], function (err, result) {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(result);
+                }
+            })
+        })
+    }
+
+    static deleteModifier(id) {
+        return new Promise(function (resolve, reject) {
+            const sql = "DELETE FROM modifier WHERE id = ?";
+            connectionMysql.query(sql, [id], function (err, result) {
                 if (err) {
                     reject(err);
                 } else {

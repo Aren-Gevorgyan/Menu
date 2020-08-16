@@ -52,10 +52,36 @@ module.exports = class Archive {
         })
     }
 
+    static getAllDataArchiveItemThroughId(id) {
+        return new Promise(function (resolve, reject) {
+            const sql = "SELECT * FROM archiveItems WHERE id = ?";
+            connectionMysql.query(sql, [id], function (err, result) {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(result);
+                }
+            })
+        })
+    }
+
     static deleteItemsCategoryDuringRestore(name) {
         return new Promise(function (resolve, reject) {
             const sql = "DELETE FROM archiveitems WHERE dishes_name = ?";
             connectionMysql.query(sql, [name], function (err, result) {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(result);
+                }
+            })
+        })
+    }
+
+    static deleteItemDishes(id) {
+        return new Promise(function (resolve, reject) {
+            const sql = "DELETE FROM archiveitems WHERE id = ?";
+            connectionMysql.query(sql, [id], function (err, result) {
                 if (err) {
                     reject(err);
                 } else {
