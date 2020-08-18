@@ -27,7 +27,49 @@ exports.dishes = function (request, response) {
     })
 }
 
-exports.assortment = function (request, response) {
+// exports.assortment = function (request, response) {
+//     let modifierData = {};
+//     getAllDataAssortment(modifierData, response);
+// }
+//
+// function getAllDataAssortment(modifierData, response) {
+//     Assortment.getAllDataAssortment().then(res => {
+//
+//         const modifier = getDataModifierThroughAssortmentId(res, modifierData)
+//         const result = {
+//             id: res[0].id,
+//             name: res[0].name,
+//             price: res[0].price,
+//             waiting_time: res[0].waiting_time,
+//             weight: res[0].weight,
+//             description: res[0].description,
+//             photo: res[0].photo,
+//             active: res[0].active,
+//             dishes_name: res[0].dishes_name,
+//             modifierItems: modifier
+//         }
+//
+//         response.json(result);
+//
+//     }).catch(err => {
+//         console.error(err.message);
+//     })
+// }
+//
+// function getDataModifierThroughAssortmentId(result, modifierData) {
+//     BindAssortmentAndModifier.getModifierThroughAssortmentId(result[0].id).then(res => {
+//         for (let i = 0; i < res.length; i++) {
+//             Modifier.getModifierDataThroughId(res[i].modifier_id).then(res => {
+//                 modifierData["items" + (i + 1)] = res[0];
+//             })
+//         }
+//     })
+//     console.log(modifierData);
+//
+//     return modifierData;
+// }
+
+exports.assortmentChild = function (request, response) {
     const getIdCategory = request.params["name"];
     Menu.getChildMenuCategory(getIdCategory).then(res => {
         response.json(res);
@@ -137,18 +179,22 @@ exports.createAssortment = function (request, response) {
     const photo = request.body.photo;
     const active = request.body.active;
     //get modifiers obj
-    const apply_modifiers = request.body.apply_modifiers;
+    const apply_modifiers_id = request.body.apply_modifiers;
     setValueForCreateAssortment(nameAssortment, price, waiting_time, weight, description, photo, active, nameCategory, response);
-    getAssortmentId(nameAssortment, apply_modifiers);
+    getAssortmentId(nameAssortment, apply_modifiers_id);
 }
 
-function getAssortmentId(name, apply_modifiers) {
+function getAssortmentId(name, apply_modifiers_id) {
     Assortment.getIdAssortmentThroughName(name).then(res => {
-        for (let val in apply_modifiers) {
-            const bindAssortmentAndModifier = new BindAssortmentAndModifier(res[0].id, apply_modifiers[val]);
-            bindAssortmentAndModifier.appendItems();
-        }
+        appendItemInBindAssortmentAndModifierTableDuringCreateAssortment(res, apply_modifiers_id);
     })
+}
+
+function appendItemInBindAssortmentAndModifierTableDuringCreateAssortment(res, id) {
+    for (let val in id) {
+        const bindAssortmentAndModifier = new BindAssortmentAndModifier(res[0].id, id[val]);
+        bindAssortmentAndModifier.appendItems();
+    }
 }
 
 function setValueForCreateAssortment(nameAssortment, price, waiting_time, weight, description, photo, active, nameCategory, response) {
@@ -204,17 +250,16 @@ exports.editAssortment = function (request, response) {
     const nameAssortment = request.body.name;
     const price = request.body.price;
     const waiting_time = request.body.waiting_time;
-    const weight = request.body.apply_modifiers;
+    const weight = request.body.weight;
     const apply_modifiers = request.body.appli_modifiers;
     const description = request.body.description;
     const photo = request.body.photo;
-    const active = request.body.active;
 
-    setValueForEditAssortment(nameAssortment, price, waiting_time, weight, apply_modifiers, description, photo, active, idAssortment);
+    setValueForEditAssortment(nameAssortment, price, waiting_time, weight, apply_modifiers, description, photo, idAssortment);
 }
 
-function setValueForEditAssortment(nameAssortment, price, waiting_time, weight, apply_modifiers, description, photo, active, idAssortment) {
-    Assortment.editAssortment(nameAssortment, price, waiting_time, weight, apply_modifiers, description, photo, active, idAssortment)
+function setValueForEditAssortment(nameAssortment, price, waiting_time, weight, apply_modifiers, description, photo, idAssortment) {
+    Assortment.editAssortment(nameAssortment, price, waiting_time, weight, apply_modifiers, description, photo, idAssortment)
         .then(() => {
             response.send("Edit assortment");
         }).catch(err => {
@@ -251,15 +296,34 @@ exports.modifier = function (request, response) {
 
 exports.createModifier = function (request, response) {
     const nameModifier = request.params["name"];
-    const price = request.params["price"];
-    const weight = request.params["weight"];
+    const price = request.body.price;
+    const weight = request.body.weight;
     const archive = request.params["archive"];
+    const items_id = request.body.items;
     const setItemArchive = archive === 'true';
 
+    appendItemInArchiveOrModifier(setItemArchive, nameModifier, price, weight, response, items_id)
+}
+
+function appendItemInArchiveOrModifier(setItemArchive, nameModifier, price, weight, response, items_id) {
     if (setItemArchive) {
         createItemInArchiveModifier(nameModifier, price, weight, response);
-    } else if (archive) {
+    } else {
         appendModifierInTableModifier(nameModifier, price, weight, response)
+        getModifierId(nameModifier, items_id);
+    }
+}
+
+function getModifierId(nameModifier, items_id) {
+    Modifier.getModifierIdThroughName(nameModifier).then(res => {
+        appendItemInBindAssortmentAndModifierTableDuringCreateModifier(items_id, res)
+    })
+}
+
+function appendItemInBindAssortmentAndModifierTableDuringCreateModifier(id, res) {
+    for (let val in id) {
+        const bindAssortmentAndModifier = new BindAssortmentAndModifier(id[val], res[0].id,);
+        bindAssortmentAndModifier.appendItems();
     }
 }
 

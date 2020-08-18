@@ -49,6 +49,19 @@ module.exports = class Modifier {
         })
     }
 
+    static getModifierIdThroughName(name) {
+        return new Promise(function (resolve, reject) {
+            const sql = "SELECT id FROM modifier WHERE name = ?";
+            connectionMysql.query(sql, [name],function (err, result) {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(result);
+                }
+            })
+        })
+    }
+
     static editModifier(name, weight, price, id){
         return new Promise(function (resolve, reject) {
             const sql = "UPDATE modifier SET name=?, weight=?, price=?  WHERE id=?;"

@@ -49,6 +49,19 @@ module.exports = class Assortment {
         })
     }
 
+    static getAllDataAssortment() {
+        return new Promise(function (resolve, reject) {
+            const sql = "SELECT * FROM assortment";
+            connectionMysql.query(sql, function (err, result) {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(result);
+                }
+            })
+        })
+    }
+
     static editAssortment(name, price, waiting, weight, description, photo, active, id) {
         return new Promise(function (resolve, reject) {
             const sql = "UPDATE assortment SET name=?, price=?, waiting_time=?, weight=?, description=?, photo=?, active=? WHERE id=?;"
