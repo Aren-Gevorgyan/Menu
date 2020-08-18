@@ -2,12 +2,11 @@ const connectionMysql = require("../utils/db");
 let assortmentItem = [];
 
 module.exports = class Assortment {
-    constructor(name, price, waiting_time, weight, apply_modifiers, description, photo, active, dishes_name) {
+    constructor(name, price, waiting_time, weight, description, photo, active, dishes_name) {
         this.name = name;
         this.price = price;
         this.waiting_time = waiting_time;
         this.weight = weight;
-        this.apply_modifiers = apply_modifiers;
         this.description = description;
         this.photo = photo;
         this.active = active;
@@ -16,7 +15,6 @@ module.exports = class Assortment {
             this.price,
             this.waiting_time,
             this.weight,
-            this.apply_modifiers,
             this.description,
             this.photo,
             this.active,
@@ -38,8 +36,8 @@ module.exports = class Assortment {
 
     createAssortment() {
         return new Promise(function (resolve, reject) {
-            const sql = "INSERT INTO assortment(name, price, waiting_time, weight, apply_modifiers, description, photo, active, dishes_name)\n" +
-                "    VALUE (?, ?, ?, ?, ?, ?, ?, ?, ?);"
+            const sql = "INSERT INTO assortment(name, price, waiting_time, weight, description, photo, active, dishes_name)\n" +
+                "    VALUE (?, ?, ?, ?, ?, ?, ?, ?);"
             connectionMysql.query(sql, assortmentItem, function (err, result) {
                 if (err) {
                     reject(err);
@@ -51,10 +49,10 @@ module.exports = class Assortment {
         })
     }
 
-    static editAssortment(name, price, waiting, weight, apply_modifiers, description, photo, active, id) {
+    static editAssortment(name, price, waiting, weight, description, photo, active, id) {
         return new Promise(function (resolve, reject) {
-            const sql = "UPDATE assortment SET name=?, price=?, waiting_time=?, weight=?, apply_modifiers=?, description=?, photo=?, active=? WHERE id=?;"
-            connectionMysql.query(sql, [name, price, waiting, weight, apply_modifiers, description, photo, active, id], function (err, result) {
+            const sql = "UPDATE assortment SET name=?, price=?, waiting_time=?, weight=?, description=?, photo=?, active=? WHERE id=?;"
+            connectionMysql.query(sql, [name, price, waiting, weight, description, photo, active, id], function (err, result) {
                 if (err) {
                     reject(err);
                 } else {
@@ -81,6 +79,19 @@ module.exports = class Assortment {
     static getAllDataAssortmentThroughName(name) {
         return new Promise(function (resolve, reject) {
             const sql = "SELECT * FROM assortment WHERE dishes_name = ?";
+            connectionMysql.query(sql, [name], function (err, result) {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(result);
+                }
+            })
+        })
+    }
+
+    static getIdAssortmentThroughName(name) {
+        return new Promise(function (resolve, reject) {
+            const sql = "SELECT id FROM assortment WHERE name = ?";
             connectionMysql.query(sql, [name], function (err, result) {
                 if (err) {
                     reject(err);

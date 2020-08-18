@@ -53,6 +53,7 @@ CREATE TABLE IF NOT EXISTS archiveModifier
     name        varchar(120) unique,
     weight      int unsigned,
     price       int unsigned,
+    modifier_to_items varchar(120),
     created_at  timestamp default CURRENT_TIMESTAMP                             not null,
     updated_at  timestamp default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP not null
 );
@@ -72,4 +73,18 @@ CREATE TABLE IF NOT EXISTS archiveItems
     number_modifier int,
     created_at      timestamp default CURRENT_TIMESTAMP                             not null,
     updated_at      timestamp default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP not null
+);
+
+CREATE TABLE IF NOT EXISTS bindAssortmentAndModifier
+(
+    assortment_id int unsigned not null,
+    modifier_id   int unsigned not null,
+    created_at    timestamp default CURRENT_TIMESTAMP                             not null,
+    updated_at    timestamp default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP not null,
+    FOREIGN KEY (assortment_id)
+        REFERENCES assortment (id)
+        ON DELETE CASCADE,
+    FOREIGN KEY (modifier_id)
+        REFERENCES modifier (id)
+        ON DELETE CASCADE
 );

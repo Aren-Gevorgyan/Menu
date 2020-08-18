@@ -5,6 +5,7 @@ const Modifier = require("../models/modifier");
 const ArchiveCategory = require("../models/archiveCategory");
 const ArchiveItem = require("../models/archiveItems");
 const ArchiveModifier = require("../models/archiveModifier");
+const BindAssortmentAndModifier = require("../models/bindAssortmentAndModifier");
 
 exports.index = function (request, response) {
     response.send("Hello");
@@ -131,18 +132,29 @@ exports.createAssortment = function (request, response) {
     const nameAssortment = request.body.name;
     const price = request.body.price;
     const waiting_time = request.body.waiting_time;
-    const weight = request.body.apply_modifiers;
+    const weight = request.body.weight;
     const description = request.body.description;
     const photo = request.body.photo;
     const active = request.body.active;
-
-    setValueForCreateAssortment(nameAssortment, price, waiting_time, weight, description, photo, active, nameCategory);
+    //get modifiers obj
+    const apply_modifiers = request.body.apply_modifiers;
+    setValueForCreateAssortment(nameAssortment, price, waiting_time, weight, description, photo, active, nameCategory, response);
+    getAssortmentId(nameAssortment, apply_modifiers);
 }
 
-function setValueForCreateAssortment(nameAssortment, price, waiting_time, weight, description, photo, active, nameCategory) {
-    const assortment = new Assortment(nameAssortment, price, waiting_time, weight, description, photo, active, nameCategory);
+function getAssortmentId(name, apply_modifiers) {
+    Assortment.getIdAssortmentThroughName(name).then(res => {
+        for (let val in apply_modifiers) {
+            const bindAssortmentAndModifier = new BindAssortmentAndModifier(res[0].id, apply_modifiers[val]);
+            bindAssortmentAndModifier.appendItems();
+        }
+    })
+}
 
+function setValueForCreateAssortment(nameAssortment, price, waiting_time, weight, description, photo, active, nameCategory, response) {
+    const assortment = new Assortment(nameAssortment, price, waiting_time, weight, description, photo, active, nameCategory);
     assortment.createAssortment().then(() => {
+        console.log(1);
         response.send("Create assortment");
     }).catch(err => {
         console.error(err.message);
@@ -229,7 +241,6 @@ function restoreAssortmentThroughId(idAssortment) {
     })
 }
 
-
 exports.modifier = function (request, response) {
     Modifier.getModifierData().then(res => {
         response.json(res);
@@ -242,6 +253,17 @@ exports.createModifier = function (request, response) {
     const nameModifier = request.params["name"];
     const price = request.params["price"];
     const weight = request.params["weight"];
+    const archive = request.params["archive"];
+    const setItemArchive = archive === 'true';
+
+    if (setItemArchive) {
+        createItemInArchiveModifier(nameModifier, price, weight, response);
+    } else if (archive) {
+        appendModifierInTableModifier(nameModifier, price, weight, response)
+    }
+}
+
+function appendModifierInTableModifier(nameModifier, price, weight, response) {
     const modifier = new Modifier(nameModifier, price, weight);
 
     modifier.createModifier().then(() => {
@@ -280,10 +302,19 @@ function deleteModifier(id, response) {
 
 function appendModifierArchive(id) {
     Modifier.getModifierDataThroughId(id).then(res => {
-        const archiveModifier = new ArchiveModifier(res[0].name, res[0].weight, res[0].price);
-        archiveModifier.createItemInArchiveModifier().catch(err => {
-            console.error(err.message);
-        });
+        const nameModifier = res[0].name;
+        const price = res[0].price;
+        const weight = res[0].weight;
+        createItemInArchiveModifier(nameModifier, price, weight);
+    }).catch(err => {
+        console.error(err.message);
+    });
+}
+
+function createItemInArchiveModifier(nameModifier, price, weight, response) {
+    const archiveModifier = new ArchiveModifier(nameModifier, price, weight);
+    archiveModifier.createItemInArchiveModifier().then(() => {
+        response.send("Append item modifier archive");
     }).catch(err => {
         console.error(err.message);
     });
