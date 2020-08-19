@@ -27,47 +27,59 @@ exports.dishes = function (request, response) {
     })
 }
 
-// exports.assortment = function (request, response) {
-//     let modifierData = {};
-//     getAllDataAssortment(modifierData, response);
-// }
-//
-// function getAllDataAssortment(modifierData, response) {
-//     Assortment.getAllDataAssortment().then(res => {
-//
-//         const modifier = getDataModifierThroughAssortmentId(res, modifierData)
-//         const result = {
-//             id: res[0].id,
-//             name: res[0].name,
-//             price: res[0].price,
-//             waiting_time: res[0].waiting_time,
-//             weight: res[0].weight,
-//             description: res[0].description,
-//             photo: res[0].photo,
-//             active: res[0].active,
-//             dishes_name: res[0].dishes_name,
-//             modifierItems: modifier
-//         }
-//
-//         response.json(result);
-//
-//     }).catch(err => {
-//         console.error(err.message);
-//     })
-// }
-//
-// function getDataModifierThroughAssortmentId(result, modifierData) {
-//     BindAssortmentAndModifier.getModifierThroughAssortmentId(result[0].id).then(res => {
-//         for (let i = 0; i < res.length; i++) {
-//             Modifier.getModifierDataThroughId(res[i].modifier_id).then(res => {
-//                 modifierData["items" + (i + 1)] = res[0];
-//             })
-//         }
-//     })
-//     console.log(modifierData);
-//
-//     return modifierData;
-// }
+exports.assortment = function (request, response) {
+    Assortment.getAllDataAssortment().then(res => {
+        response.json(res);
+    }).catch(err => {
+        console.error(err.message);
+    })
+}
+
+exports.modifierOwnedByItem = function (request, response) {
+    const id = request.params["id"];
+    returnModifiersOwnedByItem(id).then(res => {
+        response.json(res);
+    });
+}
+
+function returnModifiersOwnedByItem(id) {
+    return new Promise(resolve => {
+        getModifiersOwnedByItem(id, resolve)
+    })
+}
+
+function getModifiersOwnedByItem(id, resolve) {
+    let arrayModifier = [];
+    BindAssortmentAndModifier.getModifierThroughAssortmentId(id).then(res => {
+        addModifiersBelongingToAnElementToAnArray(res, arrayModifier);
+        getCountModifiersOwnedByItem(id).then(res => {
+            arrayModifier.push(res);
+        });
+
+        setTimeout(function () {
+            resolve(arrayModifier);
+        }, 2000);
+
+    }).catch(err => {
+        console.error(err.message);
+    })
+}
+
+function addModifiersBelongingToAnElementToAnArray(res, arrayModifier) {
+    for (let i = 0; i < res.length; i++) {
+        Modifier.getModifierDataThroughId(res[i].modifier_id).then(res => {
+            arrayModifier.push(res);
+        })
+    }
+}
+
+function getCountModifiersOwnedByItem(id) {
+    return new Promise(resolve => {
+        BindAssortmentAndModifier.getCountModifierOwnedByItem(id).then(res => {
+            resolve(res);
+        });
+    })
+}
 
 exports.assortmentChild = function (request, response) {
     const getIdCategory = request.params["name"];
@@ -146,6 +158,23 @@ function deleteCategory(idCategory, response) {
     });
 }
 
+exports.restoreCategory = function (request, response) {
+    const nameCategory = request.params["name"];
+    restoreCategory(nameCategory, response);
+    restoreAssortmentThroughName(nameCategory, response);
+    ArchiveCategory.deleteCategoryDuringRestore(nameCategory);
+    ArchiveItem.deleteItemsCategoryDuringRestore(nameCategory).then(() => {
+        response.send("Restore category");
+    });
+}
+
+function restoreCategory(nameCategory) {
+    const menu = new Menu(nameCategory, null);
+    menu.createCategory().catch(err => {
+        console.error(err.message);
+    });
+}
+
 exports.deleteAssortment = function (request, response) {
     const idAssortment = request.params["id"];
     appendAssortmentArchive(idAssortment);
@@ -207,22 +236,6 @@ function setValueForCreateAssortment(nameAssortment, price, waiting_time, weight
     });
 }
 
-exports.restoreCategory = function (request, response) {
-    const nameCategory = request.params["name"];
-    restoreCategory(nameCategory, response);
-    restoreAssortmentThroughName(nameCategory, response);
-    ArchiveCategory.deleteCategoryDuringRestore(nameCategory);
-    ArchiveItem.deleteItemsCategoryDuringRestore(nameCategory).then(() => {
-        response.send("Restore category");
-    });
-}
-
-function restoreCategory(nameCategory) {
-    const menu = new Menu(nameCategory, null);
-    menu.createCategory().catch(err => {
-        console.error(err.message);
-    });
-}
 
 function restoreAssortmentThroughName(nameCategory, response) {
     ArchiveItem.getAllDataArchiveItem(nameCategory).then(res => {
@@ -255,10 +268,10 @@ exports.editAssortment = function (request, response) {
     const description = request.body.description;
     const photo = request.body.photo;
 
-    setValueForEditAssortment(nameAssortment, price, waiting_time, weight, apply_modifiers, description, photo, idAssortment);
+    setValueForEditAssortment(nameAssortment, price, waiting_time, weight, apply_modifiers, description, photo, idAssortment, response);
 }
 
-function setValueForEditAssortment(nameAssortment, price, waiting_time, weight, apply_modifiers, description, photo, idAssortment) {
+function setValueForEditAssortment(nameAssortment, price, waiting_time, weight, apply_modifiers, description, photo, idAssortment, response) {
     Assortment.editAssortment(nameAssortment, price, waiting_time, weight, apply_modifiers, description, photo, idAssortment)
         .then(() => {
             response.send("Edit assortment");
@@ -291,6 +304,52 @@ exports.modifier = function (request, response) {
         response.json(res);
     }).catch(err => {
         console.error(err.message);
+    })
+}
+
+exports.itemOwnedByModifier = function (request, response) {
+    const id = request.params["id"];
+    returnItemsOwnedByModifier(id).then(res => {
+        response.json(res);
+    });
+}
+
+function returnItemsOwnedByModifier(id) {
+    return new Promise(resolve => {
+        getItemsOwnedByModifier(id, resolve)
+    })
+}
+
+function getItemsOwnedByModifier(id, resolve) {
+    let arrayItems = [];
+    BindAssortmentAndModifier.getAssortmentThroughModifierId(id).then(res => {
+        addItemsBelongingToAnModifierToAnArray(res, arrayItems);
+        getCountItemsOwnedByModifier(id).then(res => {
+            arrayItems.push(res);
+        });
+
+        setTimeout(function () {
+            resolve(arrayItems);
+        }, 2000);
+
+    }).catch(err => {
+        console.error(err.message);
+    })
+}
+
+function addItemsBelongingToAnModifierToAnArray(res, arrayItems) {
+    for (let i = 0; i < res.length; i++) {
+        Assortment.getAllDataAssortmentThroughId(res[i].assortment_id).then(res => {
+            arrayItems.push(res);
+        })
+    }
+}
+
+function getCountItemsOwnedByModifier(id) {
+    return new Promise(resolve => {
+        BindAssortmentAndModifier.getCountItemOwnedByModifier(id).then(res => {
+            resolve(res);
+        });
     })
 }
 
@@ -392,7 +451,6 @@ exports.restoreModifier = function (request, response) {
 
 function restoreModifier(request, id) {
     ArchiveModifier.getModifierDataThroughId(id).then(res => {
-        console.log(res);
         const modifier = new Modifier(res[0].name, res[0].weight, res[0].price);
         modifier.createModifier();
     }).catch(err => {
@@ -407,7 +465,3 @@ function deleteModifierFromArchive(request, response, id) {
         console.error(err.message);
     });
 }
-
-
-
-

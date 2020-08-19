@@ -24,18 +24,14 @@ module.exports = class Archive {
     }
 
     appendItems() {
-        return new Promise(function (resolve, reject) {
-            const sql = "INSERT INTO archiveItems(name, price, waiting_time, weight, apply_modifiers, description, photo, active, dishes_name)\n" +
-                " VALUE (?, ?, ?, ?, ?, ?, ?, ?, ?);"
-            connectionMysql.query(sql, archiveItems, function (err, result) {
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(result);
-                }
-            })
-            archiveItems.length = 0;
+        const sql = "INSERT INTO archiveItems(name, price, waiting_time, weight, apply_modifiers, description, photo, active, dishes_name)\n" +
+            " VALUE (?, ?, ?, ?, ?, ?, ?, ?, ?);"
+        connectionMysql.query(sql, archiveItems, function (err) {
+            if (err) {
+                console.error(err.message);
+            }
         })
+        archiveItems.length = 0;
     }
 
     static getAllDataArchiveItem(name) {

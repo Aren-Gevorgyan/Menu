@@ -9,7 +9,6 @@ module.exports = class Archive {
     }
 
     appendItem() {
-        return new Promise(function (resolve, reject) {
             const sql = "INSERT INTO archivecategory(name, number_item) VALUE (?,?)";
             connectionMysql.query(sql, archiveCategory, function (err, result) {
                 if (err) {
@@ -19,19 +18,14 @@ module.exports = class Archive {
                 }
             })
             archiveCategory.length = 0;
-        })
     }
 
     static deleteCategoryDuringRestore(name) {
-        return new Promise(function (resolve, reject) {
             const sql = "DELETE FROM archiveCategory WHERE name = ?";
-            connectionMysql.query(sql, [name], function (err, result) {
+            connectionMysql.query(sql, [name], function (err) {
                 if (err) {
-                    reject(err);
-                } else {
-                    resolve(result);
+                    console.error(err.message);
                 }
             })
-        })
     }
 }
