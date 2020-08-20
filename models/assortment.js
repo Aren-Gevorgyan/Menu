@@ -36,7 +36,8 @@ module.exports = class Assortment {
 
     createAssortment() {
         return new Promise(function (resolve, reject) {
-            const sql = "INSERT INTO assortment(name, price, waiting_time, weight, description, photo, active, dishes_name)\n" +
+            const sql = "INSERT INTO assortment(name, price, waiting_time, weight, description," +
+                " photo, active, dishes_name)\n" +
                 "    VALUE (?, ?, ?, ?, ?, ?, ?, ?);"
             connectionMysql.query(sql, assortmentItem, function (err, result) {
                 if (err) {
@@ -64,8 +65,10 @@ module.exports = class Assortment {
 
     static editAssortment(name, price, waiting, weight, description, photo, active, id) {
         return new Promise(function (resolve, reject) {
-            const sql = "UPDATE assortment SET name=?, price=?, waiting_time=?, weight=?, description=?, photo=?, active=? WHERE id=?;"
-            connectionMysql.query(sql, [name, price, waiting, weight, description, photo, active, id], function (err, result) {
+            const sql = "UPDATE assortment SET name=?, price=?, waiting_time=?, weight=?," +
+                " description=?, photo=?, active=? WHERE id=?"
+            connectionMysql.query(sql, [name, price, waiting, weight, description, photo, active, id],
+                function (err, result) {
                 if (err) {
                     reject(err);
                 } else {
@@ -89,7 +92,7 @@ module.exports = class Assortment {
         })
     }
 
-    static getAllDataAssortmentThroughName(name) {
+    static getAllDataAssortmentByName(name) {
         return new Promise(function (resolve, reject) {
             const sql = "SELECT * FROM assortment WHERE dishes_name = ?";
             connectionMysql.query(sql, [name], function (err, result) {
@@ -115,7 +118,7 @@ module.exports = class Assortment {
         })
     }
 
-    static getAllDataAssortmentThroughId(id) {
+    static getAllDataAssortmentById(id) {
         return new Promise(function (resolve, reject) {
             const sql = "SELECT * FROM assortment WHERE id = ?";
             connectionMysql.query(sql, [id], function (err, result) {

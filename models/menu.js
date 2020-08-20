@@ -34,7 +34,7 @@ module.exports = class Menu {
         })
     }
 
-    static getChildMenuCategory(name) {
+    static getChildCategory(name) {
         return new Promise(function (resolve, reject) {
             const sql = "SELECT id, name FROM assortment WHERE dishes_name = ?";
             connectionMysql.query(sql, [name], function (err, result) {

@@ -2,12 +2,11 @@ const connectionMysql = require("../utils/db");
 let archiveItems = [];
 
 module.exports = class Archive {
-    constructor(name, price, waiting_time, weight, apply_modifiers, description, photo, active, dishes_name) {
+    constructor(name, price, waiting_time, weight, description, photo, active, dishes_name) {
         this.name = name;
         this.price = price;
         this.waiting_time = waiting_time;
         this.weight = weight;
-        this.apply_modifiers = apply_modifiers;
         this.description = description;
         this.photo = photo;
         this.active = active;
@@ -16,7 +15,6 @@ module.exports = class Archive {
             this.price,
             this.waiting_time,
             this.weight,
-            this.apply_modifiers,
             this.description,
             this.photo,
             this.active,
@@ -24,8 +22,9 @@ module.exports = class Archive {
     }
 
     appendItems() {
-        const sql = "INSERT INTO archiveItems(name, price, waiting_time, weight, apply_modifiers, description, photo, active, dishes_name)\n" +
-            " VALUE (?, ?, ?, ?, ?, ?, ?, ?, ?);"
+        const sql = "INSERT INTO archiveItems(name, price, waiting_time, weight, description, photo," +
+            " active, dishes_name)\n" +
+            " VALUE (?, ?, ?, ?, ?, ?, ?, ?);"
         connectionMysql.query(sql, archiveItems, function (err) {
             if (err) {
                 console.error(err.message);
@@ -48,7 +47,7 @@ module.exports = class Archive {
         })
     }
 
-    static getAllDataArchiveItemThroughId(id) {
+    static getAllDataArchiveItemById(id) {
         return new Promise(function (resolve, reject) {
             const sql = "SELECT * FROM archiveItems WHERE id = ?";
             connectionMysql.query(sql, [id], function (err, result) {
@@ -74,7 +73,7 @@ module.exports = class Archive {
         })
     }
 
-    static deleteItemDishes(id) {
+    static deleteItemById(id) {
         return new Promise(function (resolve, reject) {
             const sql = "DELETE FROM archiveitems WHERE id = ?";
             connectionMysql.query(sql, [id], function (err, result) {

@@ -10,11 +10,9 @@ module.exports = class Archive {
 
     appendItem() {
             const sql = "INSERT INTO archivecategory(name, number_item) VALUE (?,?)";
-            connectionMysql.query(sql, archiveCategory, function (err, result) {
+            connectionMysql.query(sql, archiveCategory, function (err) {
                 if (err) {
-                    reject(err);
-                } else {
-                    resolve(result);
+                    console.error(err.message);
                 }
             })
             archiveCategory.length = 0;

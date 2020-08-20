@@ -37,7 +37,7 @@ module.exports = class ArchiveModifier {
         })
     }
 
-    static getModifierDataThroughId(id) {
+    static getModifierDataById(id) {
         return new Promise(function (resolve, reject) {
             const sql = "SELECT id, name, weight, price FROM archivemodifier WHERE id = ?";
             connectionMysql.query(sql, [id], function (err, result) {

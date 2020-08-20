@@ -36,7 +36,7 @@ module.exports = class Modifier {
         })
     }
 
-    static getModifierDataThroughId(id) {
+    static getModifierDataById(id) {
         return new Promise(function (resolve, reject) {
             const sql = "SELECT id, name, weight, price FROM modifier WHERE id = ?";
             connectionMysql.query(sql, [id],function (err, result) {
@@ -49,7 +49,7 @@ module.exports = class Modifier {
         })
     }
 
-    static getModifierIdThroughName(name) {
+    static getModifierIdByName(name) {
         return new Promise(function (resolve, reject) {
             const sql = "SELECT id FROM modifier WHERE name = ?";
             connectionMysql.query(sql, [name],function (err, result) {
