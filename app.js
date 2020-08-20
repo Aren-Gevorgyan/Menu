@@ -3,7 +3,6 @@ const bodyParser = require("body-parser");
 const multer = require("multer");
 const app = express();
 const menuRouter = require("./router/menuRouter");
-const urlencodedParser = bodyParser.urlencoded({extended: false});
 
 const storageConfig = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -25,8 +24,9 @@ const fileFilter = function (req, file, cb) {
     }
 }
 
+app.use(bodyParser.json());
 app.use(express.static(__dirname));
 app.use(multer({storage: storageConfig, fileFilter: fileFilter}).single("photo"));
 
-app.use("/", urlencodedParser, menuRouter);
+app.use("/", menuRouter);
 app.listen(3000);

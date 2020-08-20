@@ -203,7 +203,7 @@ function deleteAssortment(idAssortment, response) {
 function appendAssortmentArchive(idAssortment) {
     Assortment.getAllDataAssortmentById(idAssortment).then(res => {
         const archiveItems = new ArchiveItem(res[0].name, res[0].price, res[0].waiting_time, res[0].weight,
-             res[0].description, res[0].photo, res[0].active, res[0].dishes_name);
+            res[0].description, res[0].photo, res[0].active, res[0].dishes_name);
         archiveItems.appendItems();
     });
 }
@@ -230,11 +230,11 @@ exports.createAssortment = function (request, response) {
 }
 
 function appendAssortmentDuringCreate(nameAssortment, price, waiting_time, weight,
-                                    description, photo, active, nameCategory, response){
-    if(active){
+                                      description, photo, active, nameCategory, response) {
+    if (active) {
         appendArchiveItem(nameAssortment, price, waiting_time, weight,
             description, photo, active, nameCategory);
-    }else{
+    } else {
         setValueForCreateAssortment(nameAssortment, price, waiting_time, weight,
             description, photo, active, nameCategory, response);
     }
@@ -301,27 +301,27 @@ exports.editAssortment = function (request, response) {
         description, photo, active, nameCategory, idAssortment, response);
 }
 
-function setBooleanValue(setItemArchive){
-    if (setItemArchive){
+function setBooleanValue(setItemArchive) {
+    if (setItemArchive) {
         return 1;
-    }else{
+    } else {
         return 0;
     }
 }
 
 function appendAssortmentDuringEdit(nameAssortment, price, waiting_time, weight,
-                                   description, photo, active, nameCategory, idAssortment, response){
-      if(active){
-         appendArchiveItem()
-         Assortment.deleteAssortment(idAssortment);
-      }else{
-          setValueForEditAssortment(nameAssortment, price, waiting_time, weight,
-              description, photo, active, idAssortment, response);
-      }
+                                    description, photo, active, nameCategory, idAssortment, response) {
+    if (active) {
+        appendArchiveItem()
+        Assortment.deleteAssortment(idAssortment);
+    } else {
+        setValueForEditAssortment(nameAssortment, price, waiting_time, weight,
+            description, photo, active, idAssortment, response);
+    }
 }
 
 function appendArchiveItem(nameAssortment, price, waiting_time, weight,
-                           description, photo, active, nameCategory){
+                           description, photo, active, nameCategory) {
     const archiveItems = new ArchiveItem(nameAssortment, price, waiting_time, weight,
         description, photo, active, nameCategory);
     archiveItems.appendItems();
@@ -510,7 +510,7 @@ exports.restoreModifier = function (request, response) {
 
 exports.deleteModifierFromArchive = function (request, response) {
     const id = request.params["id"];
-    ArchiveModifier.deleteModifier(id).then(()=>{
+    ArchiveModifier.deleteModifier(id).then(() => {
         response.send("Delete modifier");
     }).catch(err => {
         console.error(err.message);
