@@ -17,7 +17,7 @@ menuRouter.get("/dishes/modifier/response/:id", menuController.restoreModifier);
 menuRouter.post("/dishes/assortment/create/:name", menuController.createAssortment);
 menuRouter.post("/dishes/modifier/create/:name", menuController.createModifier);
 menuRouter.get("/dishes/assortment/modifier/:id", menuController.modifierOwnedByItem);
-menuRouter.get("/dishes/modifier/assortment/:id", menuController.itemOwnedByModifier);
+menuRouter.get("/dishes/modifier/assortment/:id", menuController.modifierItem);
 menuRouter.get("/dishes/modifier/edit/:id", menuController.editModifier);
 menuRouter.get("/dishes/assortment/:id", menuController.categoryChild);
 menuRouter.get("/dishes", menuController.dishes);

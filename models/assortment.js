@@ -78,7 +78,7 @@ module.exports = class Assortment {
         })
     }
 
-    static getCountChildCategory(name) {
+    static getChildCategoryCount(name) {
 
         return new Promise(function (resolve, reject) {
             const sql = "SELECT COUNT(*) AS countValue FROM assortment WHERE dishes_name = ?";
@@ -105,7 +105,7 @@ module.exports = class Assortment {
         })
     }
 
-    static getIdAssortmentThroughName(name) {
+    static getIdAssortmentByName(name) {
         return new Promise(function (resolve, reject) {
             const sql = "SELECT id FROM assortment WHERE name = ?";
             connectionMysql.query(sql, [name], function (err, result) {

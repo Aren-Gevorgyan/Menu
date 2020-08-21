@@ -18,7 +18,7 @@ module.exports = class BindAssortmentAndModifier {
         assortmentAndModifierItem.length = 0;
     }
 
-    static getModifierThroughAssortmentId(id) {
+    static getModifierByAssortmentId(id) {
         return new Promise(function (resolve, reject) {
             const sql = "SELECT modifier_id FROM bindassortmentandmodifier WHERE assortment_id = ?";
             connectionMysql.query(sql, [id], function (err, result) {
@@ -31,7 +31,7 @@ module.exports = class BindAssortmentAndModifier {
         })
     }
 
-    static getCountModifierOwnedByItem(id) {
+    static getItemModifiersCount(id) {
         return new Promise(function (resolve, reject) {
             const sql = "SELECT COUNT(modifier_id ) AS modifierCount FROM bindassortmentandmodifier WHERE assortment_id = ?";
             connectionMysql.query(sql, [id], function (err, result) {
@@ -57,7 +57,7 @@ module.exports = class BindAssortmentAndModifier {
         })
     }
 
-    static getCountItemOwnedByModifier(id) {
+    static getModifierItemsCount(id) {
         return new Promise(function (resolve, reject) {
             const sql = "SELECT COUNT(assortment_id) AS assortmentCount FROM bindassortmentandmodifier WHERE modifier_id = ?";
             connectionMysql.query(sql, [id], function (err, result) {

@@ -50,9 +50,9 @@ function returnModifiersOwnedByItem(id) {
 
 function getModifiersOwnedByItem(id, resolve) {
     let arrayModifier = [];
-    BindAssortmentAndModifier.getModifierThroughAssortmentId(id).then(res => {
+    BindAssortmentAndModifier.getModifierByAssortmentId(id).then(res => {
         addElementModifiersInArray(res, arrayModifier);
-        getCountModifiersOwnedByItem(id).then(res => {
+        getItemModifiersCount(id).then(res => {
             arrayModifier.push(res);
         });
 
@@ -73,9 +73,9 @@ function addElementModifiersInArray(res, arrayModifier) {
     }
 }
 
-function getCountModifiersOwnedByItem(id) {
+function getItemModifiersCount(id) {
     return new Promise(resolve => {
-        BindAssortmentAndModifier.getCountModifierOwnedByItem(id).then(res => {
+        BindAssortmentAndModifier.getItemModifiersCount(id).then(res => {
             resolve(res);
         });
     })
@@ -125,7 +125,7 @@ function appendCategoryArchive(idCategory, nameCategory) {
 }
 
 function addCategoryInToArchive(categoryName, nameCategory) {
-    Assortment.getCountChildCategory(nameCategory).then(res => {
+    Assortment.getChildCategoryCount(nameCategory).then(res => {
         let getCountChildCategory = res[0].countValue;
         const archive = new ArchiveCategory(categoryName, getCountChildCategory);
         archive.appendItem();
@@ -210,15 +210,16 @@ function appendAssortmentArchive(idAssortment) {
 
 exports.createAssortment = function (request, response) {
     if (!request.body) return response.sendStatus(404);
+    const requestBody = request.body;
     const nameCategory = request.params["name"];
-    const nameAssortment = request.body.name;
-    const price = request.body.price;
-    const waiting_time = request.body.waiting_time;
-    const weight = request.body.weight;
-    const description = request.body.description;
-    const photo = request.body.photo;
-    let active = request.body.active;
-    const apply_modifiers_id = request.body.apply_modifiers;
+    const nameAssortment = requestBody.name;
+    const price = requestBody.price;
+    const waiting_time = requestBody.waiting_time;
+    const weight = requestBody.weight;
+    const description = requestBody.description;
+    const photo = requestBody.photo;
+    let active = requestBody.active;
+    const apply_modifiers_id = requestBody.apply_modifiers;
 
     const setItemArchive = active === 'true';
     active = setBooleanValue(setItemArchive);
@@ -241,7 +242,7 @@ function appendAssortmentDuringCreate(nameAssortment, price, waiting_time, weigh
 }
 
 function getAssortmentId(name, id) {
-    Assortment.getIdAssortmentThroughName(name).then(res => {
+    Assortment.getIdAssortmentByName(name).then(res => {
         for (let val in id) {
             const bindAssortmentAndModifier = new BindAssortmentAndModifier(res[0].id, id[val]);
             bindAssortmentAndModifier.appendItems();
@@ -283,16 +284,17 @@ function createAssortment(res) {
 }
 
 exports.editAssortment = function (request, response) {
-    if (!request.body) return response.sendStatus(404)
+    const requestBody = request.body;
+    if (!requestBody) return response.sendStatus(404)
     const nameCategory = request.params["name"];
     const idAssortment = request.params["id"];
-    const nameAssortment = request.body.name;
-    const price = request.body.price;
-    const waiting_time = request.body.waiting_time;
-    const weight = request.body.weight;
-    const description = request.body.description;
-    const photo = request.body.photo;
-    let active = request.body.active;
+    const nameAssortment = requestBody.name;
+    const price = requestBody.price;
+    const waiting_time = requestBody.waiting_time;
+    const weight = requestBody.weight;
+    const description = requestBody.description;
+    const photo = requestBody.photo;
+    let active = requestBody.active;
     const setItemArchive = active === 'true';
 
     active = setBooleanValue(setItemArchive, active);
@@ -365,24 +367,24 @@ exports.modifier = function (request, response) {
     })
 }
 
-exports.itemOwnedByModifier = function (request, response) {
+exports.modifierItem = function (request, response) {
     const id = request.params["id"];
-    returnItemsOwnedByModifier(id).then(res => {
+    returnModifierItems(id).then(res => {
         response.json(res);
     });
 }
 
-function returnItemsOwnedByModifier(id) {
+function returnModifierItems(id) {
     return new Promise(resolve => {
-        getItemsOwnedByModifier(id, resolve)
+        getModifierItems(id, resolve)
     })
 }
 
-function getItemsOwnedByModifier(id, resolve) {
+function getModifierItems(id, resolve) {
     let arrayItems = [];
     BindAssortmentAndModifier.getAssortmentByModifierId(id).then(res => {
         addItemsInToArray(res, arrayItems);
-        getCountItemsOwnedByModifier(id).then(res => {
+        getModifierItemsCount(id).then(res => {
             arrayItems.push(res);
         });
 
@@ -403,9 +405,9 @@ function addItemsInToArray(res, arrayItems) {
     }
 }
 
-function getCountItemsOwnedByModifier(id) {
+function getModifierItemsCount(id) {
     return new Promise(resolve => {
-        BindAssortmentAndModifier.getCountItemOwnedByModifier(id).then(res => {
+        BindAssortmentAndModifier.getModifierItemsCount(id).then(res => {
             resolve(res);
         });
     })
