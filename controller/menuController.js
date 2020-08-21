@@ -209,8 +209,8 @@ function appendAssortmentArchive(idAssortment) {
 }
 
 exports.createAssortment = function (request, response) {
-    if (!request.body) return response.sendStatus(404);
     const requestBody = request.body;
+    if (!requestBody) return response.sendStatus(404);
     const nameCategory = request.params["name"];
     const nameAssortment = requestBody.name;
     const price = requestBody.price;
